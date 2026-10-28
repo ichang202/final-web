@@ -1,0 +1,5 @@
+secret.key
+*.db
+tempCodeRunnerFile.py
+__pycache__/
+*.pyc
