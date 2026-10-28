@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}จัดการร้าน - ช้างจุ่ม{% endblock %}
+{% block content %}
+<div class="admin-wrap">
+  <nav class="sidenav" aria-label="เมนูแอดมิน">
+    <a class="{{ 'on' if request.endpoint == 'admin_dashboard' }}" href="{{ url_for('admin_dashboard') }}">ภาพรวม</a>
+    <a class="{{ 'on' if request.endpoint.startswith('admin_product') }}" href="{{ url_for('admin_products') }}">สินค้า</a>
+    <a class="{{ 'on' if request.endpoint in ('admin_orders', 'admin_order') }}" href="{{ url_for('admin_orders') }}">คำสั่งซื้อ</a>
+    <a class="{{ 'on' if request.endpoint in ('admin_members', 'admin_member') }}" href="{{ url_for('admin_members') }}">สมาชิก</a>
+    <a class="{{ 'on' if request.endpoint == 'admin_sales' }}" href="{{ url_for('admin_sales') }}">รายงานยอดขาย</a>
+  </nav>
+  <section>{% block admin %}{% endblock %}</section>
+</div>
+{% endblock %}

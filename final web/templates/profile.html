@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}บัญชีของฉัน - ช้างจุ่ม{% endblock %}
+{% block content %}
+<div class="titlebar" style="padding-top:24px"><h1>บัญชีของฉัน</h1><span class="count">แต้มสะสม {{ user.score }} แต้ม</span></div>
+<div class="two">
+  <div class="panel tablewrap">
+    <h2>คำสั่งซื้อ</h2>
+    {% if orders %}
+    <table>
+      <thead><tr><th>เลขที่</th><th>วันที่</th><th class="r">ยอดรวม</th><th>สถานะ</th></tr></thead>
+      <tbody>
+      {% for o in orders %}
+        <tr>
+          <td><a href="{{ url_for('order_detail', oid=o.id) }}" style="color:var(--accent-text)">#{{ '%05d'|format(o.id) }}</a></td>
+          <td>{{ o.created_at }}</td><td class="r">{{ o.total|baht }}</td>
+          <td><span class="badge {{ o.status }}">{{ ORDER_STATUS[o.status] }}</span></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="hint">ยังไม่มีคำสั่งซื้อ</p>{% endif %}
+  </div>
+  <div class="panel">
+    <h2>ข้อมูลส่วนตัว</h2>
+    <p class="hint" style="margin-bottom:12px">ชื่อผู้ใช้: {{ user.username }}</p>
+    <form method="post">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <div class="row2">
+        <div class="field"><label for="n">ชื่อ</label><input id="n" name="name" value="{{ user.name }}" required></div>
+        <div class="field"><label for="s">นามสกุล</label><input id="s" name="surname" value="{{ user.surname or '' }}"></div>
+      </div>
+      <div class="field"><label for="ph">เบอร์โทร</label><input id="ph" name="phone" inputmode="numeric" maxlength="10" value="{{ user.phone or '' }}" required></div>
+      <div class="field"><label for="em">อีเมล</label><input id="em" name="email" type="email" value="{{ user.email or '' }}" required></div>
+      <button class="btn solid block" type="submit">บันทึก</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}เข้าสู่ระบบ - ช้างจุ่ม{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <h2>เข้าสู่ระบบ</h2>
+  <form method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <input type="hidden" name="next" value="{{ request.args.get('next', '') }}">
+    <div class="seg">
+      <label><input type="radio" name="role" value="customer" checked>ลูกค้า</label>
+      <label><input type="radio" name="role" value="admin">ผู้ดูแลระบบ</label>
+    </div>
+    <div class="field"><label for="u">ชื่อผู้ใช้</label><input id="u" name="username" required autocomplete="username"></div>
+    <div class="field"><label for="p">รหัสผ่าน</label><input id="p" name="password" type="password" required autocomplete="current-password"></div>
+    <button class="btn solid block" type="submit">เข้าสู่ระบบ</button>
+  </form>
+  <p class="hint" style="margin-top:14px"><a href="{{ url_for('forgot') }}" style="color:var(--accent-text)">ลืมชื่อผู้ใช้หรือรหัสผ่าน?</a></p>
+  <p class="hint" style="margin-top:14px">ยังไม่มีบัญชี? <a href="{{ url_for('register') }}" style="color:var(--accent-text)">สมัครสมาชิก</a></p>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="intro">
+  <h1>การ์ดสะสม (Box &amp; Pack)</h1>
+  <p>เปิดโลกแห่งการ์ดสะสมไปกับช้างจุ่ม ไม่ว่าคุณจะเป็นเทรนเนอร์ที่ตามหา Pokémon TCG Box ล่าสุด กัปตันที่ออกเรือไปกับ One Piece Card Game หรือดูเอลลิสต์ที่มองหา Yu-Gi-Oh! เราคัดสรรทั้งแบบยก Box และ Booster Pack ของแท้ 100% พร้อมส่งตรงถึงหน้าบ้านคุณ</p>
+  <div class="brands">
+    {% for b in BRANDS %}
+    <a class="bcircle {{ 'on' if f.brand == b }}" href="{{ url_for('shop') if f.brand == b else url_for('shop', brand=b) }}">
+      <span class="ring">{% if brand_thumbs.get(b) %}<img src="{{ brand_thumbs[b]|img_url }}" alt="">{% else %}{{ BRAND_ICONS[b] }}{% endif %}</span>
+      <span class="bname">{{ b }}</span>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+
+<form class="filters" method="get" action="{{ url_for('shop') }}">
+  <input type="hidden" name="q" value="{{ f.q }}">
+  <input type="hidden" name="view" value="{{ f.view }}">
+  <label class="r2s {{ 'on' if f.ready }}">
+    <span class="bolt" aria-hidden="true">⚡</span>
+    <input type="checkbox" name="ready" value="1" {{ 'checked' if f.ready }} onchange="this.form.submit()">พร้อมจัดส่ง
+  </label>
+  <select class="pill {{ 'set' if f.brand }}" name="brand" aria-label="แบรนด์" onchange="this.form.submit()">
+    <option value="">แบรนด์</option>
+    {% for b in BRANDS %}<option {{ 'selected' if f.brand == b }}>{{ b }}</option>{% endfor %}
+  </select>
+  <select class="pill {{ 'set' if f.type }}" name="type" aria-label="ประเภท" onchange="this.form.submit()">
+    <option value="">ประเภท</option>
+    {% for t in TYPES %}<option {{ 'selected' if f.type == t }}>{{ t }}</option>{% endfor %}
+  </select>
+  <select class="pill {{ 'set' if f.lang }}" name="lang" aria-label="ภาษา" onchange="this.form.submit()">
+    <option value="">ภาษา</option>
+    {% for l in LANGS %}<option {{ 'selected' if f.lang == l }}>{{ l }}</option>{% endfor %}
+  </select>
+  <select class="pill {{ 'set' if f.price }}" name="price" aria-label="ราคา" onchange="this.form.submit()">
+    <option value="">ราคา</option>
+    {% for key, (label, lo, hi) in PRICE_RANGES.items() %}<option value="{{ key }}" {{ 'selected' if f.price == key }}>{{ label }}</option>{% endfor %}
+  </select>
+  {% if has_filter %}<a class="clear" href="{{ url_for('shop', view=f.view) }}">ล้างตัวกรอง</a>{% endif %}
+
+  <div class="right">
+    <span class="sortlbl">เรียงโดย:
+      <select class="pill plain" name="sort" aria-label="เรียงโดย" onchange="this.form.submit()">
+        {% for key, (label, _) in SORTS.items() %}<option value="{{ key }}" {{ 'selected' if f.sort == key }}>{{ label }}</option>{% endfor %}
+      </select>
+    </span>
+    <span class="viewtoggle">
+      <a class="{{ 'on' if f.view == 'grid' }}" href="{{ view_urls.grid }}">▦ รายสินค้า</a>
+      <a class="{{ 'on' if f.view == 'list' }}" href="{{ view_urls.list }}">☰ รายการ</a>
+    </span>
+  </div>
+</form>
+
+<p class="count" style="margin:14px 2px 0">{{ products|length }} รายการ</p>
+<section class="grid {{ 'list' if f.view == 'list' }}">
+  {% for p in products %}
+  <article class="card">
+    <div class="sold"><span aria-hidden="true">↗</span> {{ p.sold|compact }} sold</div>
+    <div class="thumb">
+      <img src="{{ p.image|img_url }}" alt="{{ p.name }}" loading="lazy">
+      {% if p.ready_to_ship and p.stock <= 0 %}<span class="tag out">สินค้าหมด</span>
+      {% else %}<span class="tag {{ '' if p.ready_to_ship else 'pre' }}">{{ 'พร้อมจัดส่ง' if p.ready_to_ship else 'พรีออเดอร์' }}</span>{% endif %}
+    </div>
+    <div class="cbody">
+      <div class="brand">{{ p.brand }}</div>
+      <div class="pname">{{ p.name }}</div>
+      <div class="meta">{{ p.type }} · {{ p.lang }}{% if p.ready_to_ship and 0 < p.stock <= LOW_STOCK %} · <b class="low">เหลือ {{ p.stock }} ชิ้น</b>{% endif %}</div>
+      <div class="price">{{ p.price|baht }}</div>
+      <form method="post" action="{{ url_for('cart_add', pid=p.id) }}">
+        <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+        <input type="hidden" name="next" value="{{ request.full_path }}">
+        {% if p.ready_to_ship and p.stock <= 0 %}<button class="btn" type="button" disabled>สินค้าหมด</button>
+        {% else %}<button class="btn" type="submit">ใส่ตะกร้า</button>{% endif %}
+      </form>
+    </div>
+  </article>
+  {% else %}
+  <div class="empty">ไม่พบสินค้าที่ตรงกับตัวกรอง<br>ลองล้างตัวกรองหรือค้นหาด้วยคำอื่น</div>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="empty" style="padding:120px 0">
+  <h1 style="color:var(--accent-text)">{{ code }}</h1>
+  <p style="margin:8px 0 20px">{{ msg }}</p>
+  <a class="btn" href="{{ url_for('shop') }}">กลับหน้าร้าน</a>
+</div>
+{% endblock %}

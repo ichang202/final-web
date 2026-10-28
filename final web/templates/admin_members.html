@@ -1,0 +1,22 @@
+{% extends "admin_base.html" %}
+{% block admin %}
+<div class="toolbar"><h1>สมาชิก <span class="hint">({{ members|length }} คน)</span></h1></div>
+<form class="filterbar" method="get">
+  <input class="qinput" name="q" value="{{ q }}" placeholder="ค้นหาชื่อผู้ใช้ / ชื่อ / เบอร์ / อีเมล" aria-label="ค้นหาสมาชิก">
+  <button class="btn sm" type="submit">ค้นหา</button>
+  {% if q %}<a class="btn sm" href="{{ url_for('admin_members') }}">ล้างตัวกรอง</a>{% endif %}
+</form>
+<div class="panel tablewrap">
+  <table>
+    <thead><tr><th>ชื่อผู้ใช้</th><th>ชื่อ-นามสกุล</th><th>เบอร์โทร</th><th>อีเมล</th><th class="c">แต้ม</th><th class="c">ออเดอร์</th><th class="r">ยอดซื้อ</th><th>สมัครเมื่อ</th></tr></thead>
+    <tbody>
+    {% for m in members %}
+      <tr><td><a href="{{ url_for('admin_member', uid=m.id) }}" style="color:var(--accent-text)">{{ m.username }}</a></td>
+      <td>{{ m.name }} {{ m.surname or '' }}</td><td>{{ m.phone or '-' }}</td><td>{{ m.email or '-' }}</td>
+      <td class="c">{{ m.score }}</td><td class="c">{{ m.order_count }}</td><td class="r">{{ m.spent|baht }}</td><td>{{ m.created_at }}</td></tr>
+    {% else %}<tr><td colspan="8" class="hint">ไม่พบสมาชิก</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

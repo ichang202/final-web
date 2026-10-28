@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}ตะกร้า - ช้างจุ่ม{% endblock %}
+{% block content %}
+<div class="titlebar" style="padding-top:24px"><h1>ตะกร้าของคุณ</h1></div>
+{% if not items %}
+  <div class="empty" style="padding:60px 0">ตะกร้ายังว่าง เลือกสินค้าที่ชอบแล้วกดใส่ตะกร้า<br><br>
+    <a class="btn" href="{{ url_for('shop') }}">ไปเลือกสินค้า</a></div>
+{% else %}
+<div class="two">
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>สินค้า</th><th class="c">จำนวน</th><th class="r">รวม</th><th></th></tr></thead>
+      <tbody>
+      {% for it in items %}
+        <tr>
+          <td><div style="display:flex;gap:12px;align-items:center">
+            <img class="thumb-sm" src="{{ it.p.image|img_url }}" alt="">
+            <div><div>{{ it.p.name }}</div><div class="meta">{{ it.p.price|baht }} / ชิ้น</div>
+            {% if it.short %}<div class="meta low">สต็อกเหลือ {{ it.p.stock }} ชิ้น กรุณาลดจำนวนก่อนสั่งซื้อ</div>{% endif %}</div></div></td>
+          <td class="c">
+            <form class="qty" method="post" action="{{ url_for('cart_update', pid=it.p.id) }}">
+              <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+              <button name="action" value="dec" aria-label="ลด">−</button>{{ it.qty }}<button name="action" value="inc" aria-label="เพิ่ม">+</button>
+            </form></td>
+          <td class="r">{{ it.line|baht }}</td>
+          <td class="r"><form method="post" action="{{ url_for('cart_update', pid=it.p.id) }}">
+            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+            <button class="btn danger sm" name="action" value="remove">เอาออก</button></form></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div class="sum">
+      <div><span>มูลค่าสินค้า (ก่อน VAT)</span><span>{{ (total / 1.07)|baht2 }}</span></div>
+      <div><span>VAT 7%</span><span>{{ (total - total / 1.07)|baht2 }}</span></div>
+      <div class="total"><span>รวมทั้งสิ้น</span><span>{{ total|baht2 }}</span></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>ที่อยู่จัดส่ง</h2>
+    {% if me.role == 'customer' %}
+    <form method="post" action="{{ url_for('checkout') }}">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <div class="field"><label for="sn">ชื่อผู้รับ</label><input id="sn" name="ship_name" value="{{ user.name }} {{ user.surname or '' }}" required></div>
+      <div class="field"><label for="sp">เบอร์โทร</label><input id="sp" name="ship_phone" inputmode="numeric" maxlength="10" value="{{ user.phone or '' }}" required></div>
+      <div class="field"><label for="sa">ที่อยู่</label><textarea id="sa" name="ship_address" rows="4" required></textarea></div>
+      <button class="btn solid block" type="submit">สั่งซื้อ</button>
+    </form>
+    {% else %}
+      <p class="hint" style="margin-bottom:14px">เข้าสู่ระบบด้วยบัญชีลูกค้าเพื่อสั่งซื้อ ตะกร้าของคุณจะยังอยู่</p>
+      <a class="btn solid block" href="{{ url_for('login', next=url_for('cart_page')) }}">เข้าสู่ระบบ</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}

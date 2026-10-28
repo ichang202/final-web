@@ -1,0 +1,54 @@
+{% extends "admin_base.html" %}
+{% block admin %}
+<h1 style="margin-bottom:16px">รายงานยอดขาย</h1>
+{% if sales_pic %}<img class="sales-pic" src="{{ sales_pic|img_url }}" alt="">{% endif %}
+<p class="hint" style="margin-bottom:14px">นับเฉพาะคำสั่งซื้อที่ชำระแล้ว / จัดส่งแล้ว / สำเร็จ</p>
+<div class="stats">
+  <div class="stat"><b>{{ summary.total|baht }}</b><span>ยอดขายรวม (รวม VAT)</span></div>
+  <div class="stat"><b>{{ summary.net|baht }}</b><span>ก่อน VAT</span></div>
+  <div class="stat"><b>{{ summary.vat|baht }}</b><span>VAT {{ VAT_PCT }}%</span></div>
+  <div class="stat"><b>{{ summary.orders }}</b><span>คำสั่งซื้อ</span></div>
+  <div class="stat"><b>{{ summary.avg|baht }}</b><span>เฉลี่ยต่อออเดอร์</span></div>
+</div>
+
+<div class="panel tablewrap" style="margin-bottom:20px">
+  <h2>ยอดขายรายเดือน (12 เดือนล่าสุด)</h2>
+  <table>
+    <thead><tr><th>เดือน</th><th class="c">ออเดอร์</th><th class="r">ก่อน VAT</th><th class="r">VAT</th><th class="r">รวม</th><th style="width:30%"></th></tr></thead>
+    <tbody>
+    {% for m in months %}
+      <tr><td>{{ m.m }}</td><td class="c">{{ m.n }}</td><td class="r">{{ (m.total - m.vat)|baht }}</td><td class="r">{{ m.vat|baht }}</td>
+      <td class="r">{{ m.total|baht }}</td><td><div class="bar"><i style="width:{{ (m.total / max_month * 100)|round|int }}%"></i></div></td></tr>
+    {% else %}<tr><td colspan="6" class="hint">ยังไม่มียอดขาย</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel tablewrap" style="margin-bottom:20px">
+  <h2>สินค้าทำรายได้สูงสุด</h2>
+  <table>
+    <thead><tr><th>สินค้า</th><th class="c">จำนวน</th><th class="r">รายได้</th><th style="width:30%"></th></tr></thead>
+    <tbody>
+    {% for t in top %}
+      <tr><td>{{ t.name }}</td><td class="c">{{ t.qty }}</td><td class="r">{{ t.rev|baht }}</td>
+      <td><div class="bar"><i style="width:{{ (t.rev / max_top * 100)|round|int }}%"></i></div></td></tr>
+    {% else %}<tr><td colspan="4" class="hint">ยังไม่มีข้อมูล</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="panel tablewrap">
+  <h2>สรุปตามสถานะ</h2>
+  <table>
+    <thead><tr><th>สถานะ</th><th class="c">ออเดอร์</th><th class="r">มูลค่ารวม</th></tr></thead>
+    <tbody>
+    {% for k, v in ORDER_STATUS.items() %}
+      {% set d = by_status.get(k, (0, 0)) %}
+      <tr><td><a href="{{ url_for('admin_orders', status=k) }}"><span class="badge {{ k }}">{{ v }}</span></a></td><td class="c">{{ d[0] }}</td><td class="r">{{ d[1]|baht }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

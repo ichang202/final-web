@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}ตั้งรหัสผ่านใหม่ - ช้างจุ่ม{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <h2>ตั้งรหัสผ่านใหม่</h2>
+  <form method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="field"><label for="password">รหัสผ่านใหม่</label>
+      <input id="password" name="password" type="password" required autocomplete="new-password">
+      <span class="hint">อย่างน้อย 8 ตัว มีตัวพิมพ์เล็ก พิมพ์ใหญ่ ตัวเลข และอักขระพิเศษ</span></div>
+    <div class="field"><label for="password2">ยืนยันรหัสผ่านใหม่</label>
+      <input id="password2" name="password2" type="password" required autocomplete="new-password"></div>
+    <button class="btn solid block" type="submit">บันทึกรหัสผ่านใหม่</button>
+  </form>
+</div>
+{% endblock %}

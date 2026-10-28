@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}สมัครสมาชิก - ช้างจุ่ม{% endblock %}
+{% block content %}
+<div class="panel wide">
+  <h2>สมัครสมาชิก</h2>
+  <form method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="field"><label for="username">ชื่อผู้ใช้</label>
+      <input id="username" name="username" value="{{ form.username }}" required autocomplete="username">
+      <span class="hint">อย่างน้อย 8 ตัว มีตัวพิมพ์ใหญ่ 1 ตัว ใช้ได้เฉพาะ A-Z, a-z, 0-9</span></div>
+    <div class="field"><label for="password">รหัสผ่าน</label>
+      <input id="password" name="password" type="password" required autocomplete="new-password">
+      <span class="hint">อย่างน้อย 8 ตัว มีตัวพิมพ์เล็ก พิมพ์ใหญ่ ตัวเลข และอักขระพิเศษ</span></div>
+    <div class="row2">
+      <div class="field"><label for="name">ชื่อ</label><input id="name" name="name" value="{{ form.name }}" required></div>
+      <div class="field"><label for="surname">นามสกุล</label><input id="surname" name="surname" value="{{ form.surname }}" required></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="phone">เบอร์โทรศัพท์</label><input id="phone" name="phone" inputmode="numeric" maxlength="10" value="{{ form.phone }}" required></div>
+      <div class="field"><label for="email">อีเมล</label><input id="email" name="email" type="email" value="{{ form.email }}" required></div>
+    </div>
+    <button class="btn solid block" type="submit">สมัครสมาชิก</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "admin_base.html" %}
+{% block admin %}
+<h1 style="margin-bottom:16px">{{ 'แก้ไขสินค้า' if editing else 'เพิ่มสินค้า' }}</h1>
+<div class="panel" style="max-width:640px">
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="field"><label for="name">ชื่อสินค้า</label><input id="name" name="name" value="{{ p.name }}" required></div>
+    <div class="row2">
+      <div class="field"><label for="brand">แบรนด์ / เกม</label>
+        <select id="brand" name="brand">{% for b in BRANDS %}<option {{ 'selected' if p.brand == b }}>{{ b }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="price">ราคา (บาท)</label><input id="price" name="price" type="number" step="1" min="1" value="{{ p.price }}" required></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label for="type">ประเภท</label>
+        <select id="type" name="type">{% for t in TYPES %}<option {{ 'selected' if p.type == t }}>{{ t }}</option>{% endfor %}</select></div>
+      <div class="field"><label for="lang">ภาษา</label>
+        <select id="lang" name="lang">{% for l in LANGS %}<option {{ 'selected' if p.lang == l }}>{{ l }}</option>{% endfor %}</select></div>
+    </div>
+    <div class="field"><label for="stock">จำนวนในสต็อก (ชิ้น)</label>
+      <input id="stock" name="stock" type="number" step="1" min="0" value="{{ p.stock if p.stock is not none else 0 }}" required>
+      <span class="hint">ตัดสต็อกอัตโนมัติเมื่อมีคนสั่งซื้อ และคืนให้เมื่อยกเลิกออเดอร์ (เฉพาะสินค้า "พร้อมจัดส่ง" พรีออเดอร์ไม่ตัดสต็อก)</span></div>
+    <label class="check"><input type="checkbox" name="ready" {{ 'checked' if p.ready_to_ship }}>พร้อมจัดส่ง</label>
+    <div class="field"><label for="iu">URL รูปภาพ</label><input id="iu" name="image_url" value="{{ p.image or '' }}"></div>
+    <div class="field"><label for="if">หรืออัปโหลดรูป (png, jpg, webp ไม่เกิน 5MB)</label><input id="if" name="image_file" type="file" accept="image/png,image/jpeg,image/webp"></div>
+    {% if p.image %}<img class="thumb-sm" style="width:96px;height:96px;margin-bottom:14px" src="{{ p.image|img_url }}" alt="">{% endif %}
+    <div style="display:flex;gap:10px">
+      <button class="btn solid" type="submit">บันทึก</button>
+      <a class="btn" href="{{ url_for('admin_products') }}">ยกเลิก</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

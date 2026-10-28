@@ -1,0 +1,32 @@
+{% extends "admin_base.html" %}
+{% block admin %}
+<div class="toolbar"><h1>คำสั่งซื้อ #{{ '%05d'|format(order.id) }}</h1><span class="badge {{ order.status }}">{{ ORDER_STATUS[order.status] }}</span></div>
+<div class="two" style="padding-top:0">
+  <div class="panel tablewrap">
+    <table>
+      <thead><tr><th>สินค้า</th><th class="r">ราคา</th><th class="c">จำนวน</th><th class="r">รวม</th></tr></thead>
+      <tbody>{% for it in items %}
+        <tr><td>{{ it.name }}</td><td class="r">{{ it.price|baht }}</td><td class="c">{{ it.qty }}</td><td class="r">{{ (it.price * it.qty)|baht }}</td></tr>
+      {% endfor %}</tbody>
+    </table>
+    <div class="sum">
+      <div><span>ก่อน VAT</span><span>{{ (order.total - order.vat_amount)|baht2 }}</span></div>
+      <div><span>VAT {{ VAT_PCT }}%</span><span>{{ order.vat_amount|baht2 }}</span></div>
+      <div class="total"><span>รวมทั้งสิ้น</span><span>{{ order.total|baht2 }}</span></div>
+    </div>
+    <p class="hint" style="margin-top:16px">ลูกค้า: {{ order.username }}<br>จัดส่งถึง: {{ order.ship_name }} · {{ order.ship_phone }}<br>{{ order.ship_address }}<br>สั่งเมื่อ {{ order.created_at }}</p>
+  </div>
+  <div class="panel">
+    <h2>สถานะ</h2>
+    <form method="post">
+      <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+      <div class="field"><select name="status" aria-label="สถานะ">
+        {% for k, v in ORDER_STATUS.items() %}<option value="{{ k }}" {{ 'selected' if order.status == k }}>{{ v }}</option>{% endfor %}
+      </select></div>
+      <button class="btn solid block" type="submit">บันทึกสถานะ</button>
+      <p class="hint" style="margin-top:8px">แต้มสะสม 1 แต้มต่อ 100 บาท จะถูกเพิ่มให้ลูกค้าเมื่อยืนยันการชำระครั้งแรก</p>
+    </form>
+    {% if order.slip_image %}<img class="slip" src="{{ order.slip_image|img_url }}" alt="สลิปโอนเงิน">{% else %}<p class="hint" style="margin-top:12px">ยังไม่มีสลิป</p>{% endif %}
+  </div>
+</div>
+{% endblock %}

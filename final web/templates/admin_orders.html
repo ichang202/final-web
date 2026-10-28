@@ -1,0 +1,27 @@
+{% extends "admin_base.html" %}
+{% block admin %}
+<div class="toolbar"><h1>คำสั่งซื้อ <span class="hint">({{ orders|length }} รายการ)</span></h1>
+  <a class="btn sm" href="{{ url_for('admin_orders_csv', status=status, q=q) }}">ดาวน์โหลด CSV</a></div>
+<form class="filterbar" method="get">
+  <input class="qinput" name="q" value="{{ q }}" placeholder="ค้นหาเลขที่ / ชื่อผู้ใช้ / ชื่อผู้รับ" aria-label="ค้นหาคำสั่งซื้อ">
+  <select class="pill {{ 'set' if status }}" name="status" aria-label="สถานะ" onchange="this.form.submit()">
+    <option value="">ทุกสถานะ</option>
+    {% for k, v in ORDER_STATUS.items() %}<option value="{{ k }}" {{ 'selected' if status == k }}>{{ v }}</option>{% endfor %}
+  </select>
+  <button class="btn sm" type="submit">ค้นหา</button>
+  {% if q or status %}<a class="btn sm" href="{{ url_for('admin_orders') }}">ล้างตัวกรอง</a>{% endif %}
+</form>
+<div class="panel tablewrap">
+  <table>
+    <thead><tr><th>เลขที่</th><th>วันที่</th><th>ลูกค้า</th><th class="r">ยอดรวม</th><th>สถานะ</th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+      <tr><td><a href="{{ url_for('admin_order', oid=o.id) }}" style="color:var(--accent-text)">#{{ '%05d'|format(o.id) }}</a></td>
+      <td>{{ o.created_at }}</td><td>{{ o.username }}</td><td class="r">{{ o.total|baht }}</td>
+      <td><span class="badge {{ o.status }}">{{ ORDER_STATUS[o.status] }}</span></td></tr>
+    {% else %}<tr><td colspan="5" class="hint">ไม่มีคำสั่งซื้อ</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

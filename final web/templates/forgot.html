@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}ลืมบัญชี - ช้างจุ่ม{% endblock %}
+{% block content %}
+<div class="panel narrow">
+  <h2>ลืมชื่อผู้ใช้ / รหัสผ่าน</h2>
+  <p class="hint" style="margin-bottom:12px">กรอกอีเมลที่ใช้สมัคร เราจะส่งชื่อผู้ใช้และลิงก์ตั้งรหัสผ่านใหม่ไปให้ทางอีเมล</p>
+  <form method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+    <div class="field"><label for="email">อีเมล</label><input id="email" name="email" type="email" value="{{ email }}" required autocomplete="email"></div>
+    <button class="btn solid block" type="submit">ส่งอีเมลกู้บัญชี</button>
+  </form>
+  <p class="hint" style="margin-top:14px"><a href="{{ url_for('login') }}" style="color:var(--accent-text)">กลับไปหน้าเข้าสู่ระบบ</a></p>
+</div>
+{% endblock %}

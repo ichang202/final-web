@@ -1,0 +1,48 @@
+{% extends "admin_base.html" %}
+{% block admin %}
+<div class="toolbar"><h1>สินค้า <span class="hint">({{ products|length }} รายการ)</span></h1><a class="btn solid" href="{{ url_for('admin_product_new') }}">เพิ่มสินค้า</a></div>
+<form class="filterbar" method="get">
+  <input class="qinput" name="q" value="{{ q }}" placeholder="ค้นหาชื่อสินค้า" aria-label="ค้นหาชื่อสินค้า">
+  <select class="pill {{ 'set' if brand }}" name="brand" aria-label="แบรนด์" onchange="this.form.submit()">
+    <option value="">ทุกแบรนด์</option>
+    {% for b in BRANDS %}<option value="{{ b }}" {{ 'selected' if brand == b }}>{{ b }}</option>{% endfor %}
+  </select>
+  <button class="btn sm" type="submit">ค้นหา</button>
+  <label class="check" style="margin:0"><input type="checkbox" name="low" value="1" {{ 'checked' if low }} onchange="this.form.submit()">เฉพาะใกล้หมด / หมด</label>
+  {% if q or brand or low %}<a class="btn sm" href="{{ url_for('admin_products') }}">ล้างตัวกรอง</a>{% endif %}
+</form>
+<div class="panel tablewrap">
+  <table>
+    <thead><tr><th></th><th>ชื่อ</th><th>หมวด</th><th class="r">ราคา</th><th>สต็อก</th><th>สถานะ</th><th></th></tr></thead>
+    <tbody>
+    {% for p in products %}
+      <tr>
+        <td><img class="thumb-sm" src="{{ p.image|img_url }}" alt=""></td>
+        <td>{{ p.name }}<div class="meta">{{ p.type }} · {{ p.lang }} · ขายแล้ว {{ p.sold }}</div></td>
+        <td>{{ p.brand }}</td><td class="r">{{ p.price|baht }}</td>
+        <td style="white-space:nowrap">
+          {% if p.ready_to_ship and p.stock <= 0 %}<b class="low">หมด</b>
+          {% elif p.ready_to_ship and p.stock <= LOW_STOCK %}<b class="low">{{ p.stock }}</b> <span class="meta">ใกล้หมด</span>
+          {% elif p.ready_to_ship %}<b>{{ p.stock }}</b>
+          {% else %}<span class="meta">{{ p.stock }} (ไม่ตัดสต็อก)</span>{% endif %}
+          <form class="inline" method="post" action="{{ url_for('admin_product_stock', pid=p.id) }}" style="margin-top:6px;display:flex;gap:4px">
+            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+            <input type="number" name="qty" step="1" required aria-label="จำนวน" placeholder="จำนวน" style="width:76px;height:30px;padding:0 6px">
+            <button class="btn sm" name="mode" value="add" type="submit" title="เพิ่ม/ลดจากของเดิม (ใส่ -3 เพื่อลด)">+/−</button>
+            <button class="btn sm" name="mode" value="set" type="submit" title="ตั้งเป็นจำนวนนี้">ตั้งค่า</button>
+          </form></td>
+        <td><form class="inline" method="post" action="{{ url_for('admin_product_toggle', pid=p.id) }}">
+          <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+          <button class="btn sm" type="submit">{{ 'พร้อมจัดส่ง' if p.ready_to_ship else 'พรีออเดอร์' }}</button></form></td>
+        <td class="r" style="white-space:nowrap">
+          <a class="btn sm" href="{{ url_for('admin_product_edit', pid=p.id) }}">แก้ไข</a>
+          <form class="inline" method="post" action="{{ url_for('admin_product_delete', pid=p.id) }}" onsubmit="return confirm('ลบสินค้านี้?')">
+            <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+            <button class="btn danger sm" type="submit">ลบ</button></form></td>
+      </tr>
+    {% else %}<tr><td colspan="7" class="hint">ยังไม่มีสินค้า</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

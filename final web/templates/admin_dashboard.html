@@ -1,0 +1,36 @@
+{% extends "admin_base.html" %}
+{% block admin %}
+<h1 style="margin-bottom:16px">ภาพรวมร้าน</h1>
+<div class="stats">
+  <div class="stat"><b>{{ stats.revenue|baht }}</b><span>ยอดขาย (ชำระแล้ว)</span></div>
+  <div class="stat"><b>{{ stats.orders }}</b><span>คำสั่งซื้อทั้งหมด</span></div>
+  <div class="stat"><b>{{ stats.to_check }}</b><span>รอตรวจสลิป</span></div>
+  <div class="stat"><b>{{ stats.products }}</b><span>สินค้า</span></div>
+  <a class="stat" href="{{ url_for('admin_products', low=1) }}"><b {% if stats.low_stock %}class="low"{% endif %}>{{ stats.low_stock }}</b><span>สินค้าใกล้หมด / หมด</span></a>
+  <div class="stat"><b>{{ stats.members }}</b><span>สมาชิก</span></div>
+</div>
+<div class="panel tablewrap" style="margin-bottom:20px">
+  <h2>คำสั่งซื้อตามสถานะ</h2>
+  <div class="chips">
+    {% for k, v in ORDER_STATUS.items() %}
+    <a class="chip" href="{{ url_for('admin_orders', status=k) }}"><span class="badge {{ k }}">{{ v }}</span> <b>{{ by_status.get(k, 0) }}</b></a>
+    {% endfor %}
+  </div>
+</div>
+<div class="panel tablewrap" style="margin-bottom:20px">
+  <h2>คำสั่งซื้อล่าสุด</h2>
+  {% if recent %}
+  <table>
+    <thead><tr><th>เลขที่</th><th>ลูกค้า</th><th class="r">ยอดรวม</th><th>สถานะ</th></tr></thead>
+    <tbody>{% for o in recent %}
+      <tr><td><a href="{{ url_for('admin_order', oid=o.id) }}" style="color:var(--accent-text)">#{{ '%05d'|format(o.id) }}</a></td>
+      <td>{{ o.username }}</td><td class="r">{{ o.total|baht }}</td><td><span class="badge {{ o.status }}">{{ ORDER_STATUS[o.status] }}</span></td></tr>
+    {% endfor %}</tbody>
+  </table>
+  {% else %}<p class="hint">ยังไม่มีคำสั่งซื้อ</p>{% endif %}
+</div>
+<div class="panel tablewrap">
+  <h2>สินค้าขายดี</h2>
+  <table><tbody>{% for t in top %}<tr><td>{{ t.name }}</td><td class="r">{{ t.sold }} ชิ้น</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endblock %}
